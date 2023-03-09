@@ -59,16 +59,16 @@ function getStyle(options, containerAndType, style, styleMap) {
         elements.push(`    fontWeight: FontWeight.w${style.fontWeight}`);
     }
 
-    if ('fontFamily' in style) {
-        elements.push(`    fontFamily: "${style.fontFamily}"`);
-    }
+    // if ('fontFamily' in style) {
+    //     elements.push(`    fontFamily: "${style.fontFamily}"`);
+    // }
 
     if ('fontStyle' in style) {
         elements.push(`    fontStyle:  FontStyle.${style.fontStyle}`);
     }
 
     if ('fontSize' in style) {
-        elements.push(`    fontSize: ${(style.fontSize/divisor).toFixed(1)}`);
+        elements.push(`    fontSize: ${(style.fontSize / divisor).toFixed(1)}`);
     }
 
     return `const TextStyle(
@@ -86,9 +86,9 @@ function getConfigName(baseName, options) {
 }
 
 function getStyleguideTextStylesCodes(options, containerAndType, textStyles) {
-	return textStyles.map(style => {
-		return `  static const ${camelize(style.name)} = ${getStyle(options, containerAndType, style)}`;
-	});
+    return textStyles.map(style => {
+        return `  static const ${camelize(style.name)} = ${getStyle(options, containerAndType, style)}`;
+    });
 }
 
 function getStyleguideTextStylesCode(options, containerAndType, textStyles) {
@@ -104,8 +104,8 @@ function getTextSpan(options, containerAndType, content, textStyle, styleMap) {
 }
 
 function getTextSpans(options, containerAndType, content, textStyles, styleMap) {
-    return textStyles.map( textStyle => {
-        var str = content.substring(textStyle.range.start, textStyle.range.end+1);
+    return textStyles.map(textStyle => {
+        var str = content.substring(textStyle.range.start, textStyle.range.end + 1);
 
         return getTextSpan(options, containerAndType, str, textStyle.textStyle, styleMap)
     });
@@ -153,7 +153,7 @@ function handleOpacity(code, opacity) {
 function handleGradient(gradient, colorMap, options) {
     var colors = [];
     var i;
-    for (i = 0; i < gradient.colorStops.length; i++) { 
+    for (i = 0; i < gradient.colorStops.length; i++) {
         //debugLog(`gradient.colorStops[${i}].color = ${JSON.stringify(gradient.colorStops[i].color)}`);
         colors.push(getColorByMap(gradient.colorStops[i].color, colorMap, options));
     }
@@ -179,7 +179,7 @@ function handleBoxDecoration(borderRadius, borders, fills, shadows, colorMap, op
   Radius.circular(${borderRadius}) 
 )`);
     }
-    var color = getColorByMap({r: 0, b: 0, g: 0, a: 255}, colorMap, options);
+    var color = getColorByMap({ r: 0, b: 0, g: 0, a: 255 }, colorMap, options);
     var width = 1;
     if (borders.length != 0) {
         var borderAttrs = [];
@@ -187,9 +187,9 @@ function handleBoxDecoration(borderRadius, borders, fills, shadows, colorMap, op
         if (border.fill.type == "color") {
             color = getColorByMap(border.fill.color, colorMap, options);
             borderAttrs.push(`  color: ${color}`)
-        // } else if (border.fill.type == "gradient") {
-        //     color = handleGradient(border.fill.gradient, colorMap, options);
-        //     borderAttrs.push(`  gradient: ${color}`)
+            // } else if (border.fill.type == "gradient") {
+            //     color = handleGradient(border.fill.gradient, colorMap, options);
+            //     borderAttrs.push(`  gradient: ${color}`)
         }
         if (border.thickness != null) {
             width = border.thickness;
@@ -202,9 +202,9 @@ function handleBoxDecoration(borderRadius, borders, fills, shadows, colorMap, op
     if (shadows != null && shadows.length != 0) {
         attrs.push(`  boxShadow: [${shadows.map(
             shadow => {
-                return  handleBoxShadow(shadow, colorMap, options)
+                return handleBoxShadow(shadow, colorMap, options)
             }
-            ).join(", ")}] `);
+        ).join(", ")}] `);
     }
 
     var fill = handleFill(fills, colorMap, options);
@@ -244,9 +244,9 @@ function handleFill(fills, colorMap, options) {
 
 function getColorByMap(color, colorMap, options) {
     var formattedColor = getColor(color);
-    if (formattedColor in colorMap) {
-        return `${getConfigName("Colors", options)}.${colorMap[formattedColor]}`;
-    }
+    // if (formattedColor in colorMap) {
+    //     return `${getConfigName("Colors", options)}.${colorMap[formattedColor]}`;
+    // }
     return formattedColor;
 }
 
@@ -264,7 +264,7 @@ function getStyleMap(containerAndType, useLinkedStyleguides) {
             We don't want to override already set keys because
             colors are supplied from bottom to top (first from local styleguide then linked styleguide then styleguides from children to parent)
         */
-       styleMap[styleString] = styleMap[styleString] ? styleMap[styleString] : camelize(style.name);
+        styleMap[styleString] = styleMap[styleString] ? styleMap[styleString] : camelize(style.name);
         return styleMap;
     }, {});
 }
@@ -295,12 +295,12 @@ function processLayer(containerAndType, layer, options, child, usePositioned, us
     debugLog(layer);
 
     var colorMap = getColorMap(containerAndType, useLinkedStyleguides)
-    var styleMap = getStyleMap(containerAndType, useLinkedStyleguides)
+    var styleMap = {}
 
     var elements = []
     var code = "";
 
-	if (layer.type == "text") {
+    if (layer.type == "text") {
         var content = layer.content
         if (layer.textStyles.length > 1) {
             var textSpans = getTextSpans(options, containerAndType, content, layer.textStyles, styleMap).join(",\n      ");
@@ -311,39 +311,39 @@ function processLayer(containerAndType, layer, options, child, usePositioned, us
     ]
   )
 )`;
-         } else if (layer.textStyles.length == 1) {
+        } else if (layer.textStyles.length == 1) {
 
             var attrs = [];
             attrs.push(`"${content}"`);
             var style = getStyle(options, containerAndType, layer.textStyles[0].textStyle, styleMap);
             attrs.push(`style: ${style}`);
             // textStyle.textAlign : String Horizontal alignment of the text style, left, right, center, or justify.
-            var alignment = layer.textStyles[0].textStyle.textAlign;
-            if (alignment != null && alignment != "undefined") {
-                attrs.push(`textAlign: TextAlign.${alignment}`);
-            }
+            // var alignment = layer.textStyles[0].textStyle.textAlign;
+            // if (alignment != null && alignment != "undefined") {
+            //     attrs.push(`textAlign: TextAlign.${alignment}`);
+            // }
             code = `Text(
 ${attrs.join(",\n")}                
 )`;
-         }
+        }
 
-         if (layer.rect.width != 0 && layer.rect.height != 0 && handleScreens == true) {
-             code = `SizedBox(
+        if (layer.rect.width != 0 && layer.rect.height != 0 && handleScreens == true) {
+            code = `SizedBox(
   width: ${layer.rect.width / divisor},
-  height: ${layer.rect.height/ divisor},
+  height: ${layer.rect.height / divisor},
   child: ${indent(code)}
              )`
-         }
+        }
 
-         //return code;
+        //return code;
     } else if (layer.type == "shape") {
         attrs = [];
 
         if (useFullScreen != true) {
             attrs.push(`  width: ${layer.rect.width / divisor}`);
-            attrs.push(`  height: ${layer.rect.height/ divisor}`);
+            attrs.push(`  height: ${layer.rect.height / divisor}`);
         }
-    
+
         var boxDecoration = handleBoxDecoration(layer.borderRadius, layer.borders, layer.fills, layer.shadows, colorMap, options);
         if (boxDecoration.length > 0) {
             attrs.push(boxDecoration);
@@ -358,10 +358,10 @@ ${attrs.join(",\n")}
 
         if (layer.rotation != 0) {
             code = `Transform.rotate(
-                angle: ${layer.rotation * Math.PI/180},
+                angle: ${layer.rotation * Math.PI / 180},
                 child: ${code}
               )`
-         }
+        }
 
         if (useFullScreen == true) {
             code = `Center(
@@ -370,26 +370,25 @@ ${attrs.join(",\n")}
         }
 
     } else if (layer.type == "group") {
-        if (layer.layers.length > 1) {
-        var children = [];
-        var i;
-        for (i = 0; i < layer.layers.length; i++) { 
-            child = processLayer(containerAndType, layer.layers[i], options, null, true);
-            if (child.length > 0) {
-                children.push(indent(child));
-            }
-        }
-        code = `Stack(children: [
-${children.join(",\n")}
-])`;
-        } else {
-            code = processLayer(containerAndType, layer.layers[0], options);
-        }
-        if (layer.rect.width != 0 && layer.rect.height != 0 && handleScreens == true) {
+        //         if (layer.layers.length > 1) {
+        //             var children = [];
+        //             var i;
+        //             for (i = 0; i < layer.layers.length; i++) {
+        //                 child = processLayer(containerAndType, layer.layers[i], options, null, true);
+        //                 if (child.length > 0) {
+        //                     children.push(indent(child));
+        //                 }
+        //             }
+        //             code = `Stack(children: [
+        // ${children.join(",\n")}
+        // ])`;
+        //         } else {
+        //             code = processLayer(containerAndType, layer.layers[0], options);
+        //         }
+        if (layer.rect.width != 0 && layer.rect.height != 0) {
             code = `SizedBox(
  width: ${layer.rect.width / divisor},
- height: ${layer.rect.height/ divisor},
- child: ${indent(code)}
+ height: ${layer.rect.height / divisor},
             )`
         }
 
@@ -406,9 +405,9 @@ ${children.join(",\n")}
         code = handlePositioned(code, layer.rect)
     }
 
-    if (code.length > 0) {
-        code = `// ${layer.name} \n` + code;
-    }
+    // if (code.length > 0) {
+    //     code = `// ${layer.name} \n` + code;
+    // }
 
 
     return code; // + "\n\n" + JSON.stringify(layer, null, 2);
@@ -428,7 +427,7 @@ function processLayerList(containerAndType, layers, options, useFullScreen) {
         debugLog("processLayerList C\n");
         var children = [];
         var i;
-        for (i = 1; i < layers.length; i++) { 
+        for (i = 1; i < layers.length; i++) {
             child = processLayer(containerAndType, layers[i], options, null, true);
             if (child.length > 0) {
                 children.push(indent(child));
@@ -439,7 +438,7 @@ ${children.join(",\n")}
 ])`;
         return processLayer(containerAndType, layers[0], options, child, false, useFullScreen);
     }
-  
+
 }
 // Handle a layer request.  This will call processLayer to 
 // generate the code for individual layers, and assemble
